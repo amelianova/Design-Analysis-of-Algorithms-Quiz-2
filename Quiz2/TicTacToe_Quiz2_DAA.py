@@ -258,3 +258,40 @@ def dfs_best_move(board, player, max_depth=3):
             best_move = move
     
     return best_move
+
+# Greedy Algorithm implementation
+def greedy_best_move(board, player):
+    """
+    Greedy Algorithm Implementation - always choose the move with the best current evaluation
+    """
+    available_moves = get_available_moves(board)
+    if not available_moves:
+        return None
+    
+    best_move = None
+    best_score = -math.inf
+    opponent = "X" if player == "O" else "O"
+    
+    for move in available_moves:
+        row, col = move
+        make_move(board, row, col, player)
+        
+        # priority: win outright
+        if check_winner(board, player):
+            undo_move(board, row, col)
+            return move
+        
+        score = evaluate_position(board, player)
+        
+        # bonus for blocking enemies
+        undo_move(board, row, col)
+        make_move(board, row, col, opponent)
+        if check_winner(board, opponent):
+            score += 500  # big bonus for blocking enemy wins
+        undo_move(board, row, col)
+        
+        if score > best_score:
+            best_score = score
+            best_move = move
+    
+    return best_move
