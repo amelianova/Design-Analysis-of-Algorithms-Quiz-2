@@ -72,3 +72,36 @@ def check_winner(board, player):
 # check if the board is full (draw game)
 def is_draw(board):
     return all(cell != " " for row in board for cell in row)
+    
+# get a list of possible steps
+def get_available_moves(board):
+    return [(row, col) for row in range(4) for col in range(4) if board[row][col] == " "]
+
+# function to make moves on the board
+def make_move(board, row, col, player):
+    board[row][col] = player
+
+# function to cancel a move on the board
+def undo_move(board, row, col):
+    board[row][col] = " "
+
+# function to copy board
+def copy_board(board):
+    return [row[:] for row in board]
+
+# more sophisticated heuristic evaluation functions
+def evaluate_position(board, player):
+    score = 0
+    opponent = "X" if player == "O" else "O"
+    
+    # Evaluation for each row, column, and diagonal
+    lines = []
+    
+    # line
+    for i in range(4):
+        lines.append([board[i][j] for j in range(4)])
+    
+    # column
+    for j in range(4):
+        lines.append([board[i][j] for i in range(4)])
+        
