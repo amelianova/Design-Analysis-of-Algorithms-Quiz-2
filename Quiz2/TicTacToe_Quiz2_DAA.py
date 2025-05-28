@@ -388,3 +388,57 @@ def play_game():
         return
 
     print(f"Game Levels: {difficulty}")
+
+    # game screen initialization
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption(f"Tic-Tac-Toe 4x4 - Level {difficulty}")
+
+    clock = pygame.time.Clock()
+    game_over = False
+    player_turn = True
+    thinking = False
+
+    while not game_over:
+        screen.fill(BACKGROUND_COLOR)
+        draw_lines(screen)
+        draw_figures(screen, board)
+        
+        # displays the level in the upper right corner
+        draw_text(screen, f"Level: {difficulty}", 20, (100, 100, 100), SCREEN_WIDTH - 80, 20)
+        
+        if thinking:
+            draw_text(screen, "Computer Turn", 24, (255, 100, 100), SCREEN_WIDTH // 2, 20)
+        
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            if event.type == pygame.MOUSEBUTTONDOWN and player_turn and not thinking:
+                x, y = pygame.mouse.get_pos()
+                row = y // SQUARE_SIZE
+                col = x // SQUARE_SIZE
+
+                if 0 <= row < BOARD_ROWS and 0 <= col < BOARD_COLS and board[row][col] == " ":
+                    make_move(board, row, col, "X")
+                    player_turn = False
+
+                    if check_winner(board, "X"):
+                        screen.fill(BACKGROUND_COLOR)
+                        draw_lines(screen)
+                        draw_figures(screen, board)
+                        draw_text(screen, " Bravo! ", 40, (0, 200, 0), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20)
+                        draw_text(screen, "You Win!", 32, (0, 150, 0), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20)
+                        pygame.display.update()
+                        pygame.time.delay(3000)
+                        game_over = True
+                    elif is_draw(board):
+                        screen.fill(BACKGROUND_COLOR)
+                        draw_lines(screen)
+                        draw_figures(screen, board)
+                        draw_text(screen, "DRAW!", 40, (255, 165, 0), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20)
+                        draw_text(screen, "Game Ends in a Draw", 24, (200, 130, 0), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20)
+                        pygame.display.update()
+                        pygame.time.delay(3000)
+                        game_over = True
