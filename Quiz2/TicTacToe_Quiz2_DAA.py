@@ -159,3 +159,38 @@ def bfs_best_move(board, player, max_depth=3):
     
     return best_move
 
+def bfs_evaluate(board, player, max_depth):
+    """
+    Evaluation using BFS with limited depth
+    """
+    if max_depth == 0:
+        return evaluate_position(board, player)
+    
+    opponent = "X" if player == "O" else "O"
+    
+    # check terminal condition
+    if check_winner(board, player):
+        return 1000 - (3 - max_depth) * 100
+    if check_winner(board, opponent):
+        return -1000 + (3 - max_depth) * 100
+    if is_draw(board):
+        return 0
+    
+    # BFS for exploration
+    queue = deque()
+    available_moves = get_available_moves(board)
+    
+    total_score = 0
+    move_count = 0
+    
+    for move in available_moves:
+        row, col = move
+        new_board = copy_board(board)
+        make_move(new_board, row, col, opponent)  # enemy movement simulation
+        
+        # evaluate position after enemy moves
+        opponent_score = bfs_evaluate(new_board, player, max_depth - 1)
+        total_score += opponent_score
+        move_count += 1
+    
+    return total_score / max(move_count, 1) if move_count > 0 else 0
