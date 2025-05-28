@@ -295,3 +295,96 @@ def greedy_best_move(board, player):
             best_move = move
     
     return best_move
+
+# function to get computer steps based on difficulty level
+def get_best_move(board, difficulty):
+    moves = get_available_moves(board)
+    if not moves:
+        return None
+    
+    if difficulty == "Easy":
+        return random.choice(moves)
+    elif difficulty == "Medium":
+        # medium using a combination of random and BFS
+        if random.random() < 0.4:
+            return random.choice(moves)
+        else:
+            return bfs_best_move(board, "O", max_depth=2)
+    else:  # hard
+        # hard using BFS with maximum depth
+        return bfs_best_move(board, "O", max_depth=4)
+
+# choose difficulty level
+def choose_difficulty():
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption("Select Game Level")
+
+    # color to make it more attractive
+    colors = {
+        'easy': (144, 238, 144),    # light green
+        'medium': (255, 223, 186),  # peach
+        'hard': (255, 182, 193),    # light pink
+    }
+
+    difficulty = None
+    
+    while difficulty is None:
+        screen.fill(BACKGROUND_COLOR)
+        
+        # title
+        draw_text(screen, "TIC-TAC-TOE", 45, (0, 51, 102), SCREEN_WIDTH // 2, 60)
+        draw_text(screen, "Select Game Level", 32, (102, 102, 102), SCREEN_WIDTH // 2, 100)
+        
+        # buttons with size and position
+        button_easy = pygame.Rect(75, 160, 350, 70)
+        button_medium = pygame.Rect(75, 250, 350, 70)
+        button_hard = pygame.Rect(75, 340, 350, 70)
+        
+        # button image with gradient and shadow effect
+        pygame.draw.rect(screen, (200, 200, 200), pygame.Rect(78, 163, 350, 70), border_radius=12)  # shadow
+        pygame.draw.rect(screen, colors['easy'], button_easy, border_radius=12)
+        pygame.draw.rect(screen, (200, 200, 200), pygame.Rect(78, 253, 350, 70), border_radius=12)  # shadow
+        pygame.draw.rect(screen, colors['medium'], button_medium, border_radius=12)
+        pygame.draw.rect(screen, (200, 200, 200), pygame.Rect(78, 343, 350, 70), border_radius=12)  # shadow
+        pygame.draw.rect(screen, colors['hard'], button_hard, border_radius=12)
+        
+        # border for button
+        pygame.draw.rect(screen, (100, 100, 100), button_easy, 3, border_radius=12)
+        pygame.draw.rect(screen, (100, 100, 100), button_medium, 3, border_radius=12)
+        pygame.draw.rect(screen, (100, 100, 100), button_hard, 3, border_radius=12)
+        
+        # button text
+        draw_text(screen, "EASY", 28, (0, 0, 0), SCREEN_WIDTH // 2, 180)
+        
+        draw_text(screen, "MEDIUM", 28, (0, 0, 0), SCREEN_WIDTH // 2, 270)
+        
+        draw_text(screen, "HARD", 28, (0, 0, 0), SCREEN_WIDTH // 2, 360)
+        
+        draw_text(screen, "Click to Choose a Level", 20, (150, 150, 150), SCREEN_WIDTH // 2, 450)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return None
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_easy.collidepoint(event.pos):
+                    difficulty = "Easy"
+                elif button_medium.collidepoint(event.pos):
+                    difficulty = "Medium"
+                elif button_hard.collidepoint(event.pos):
+                    difficulty = "Hard"
+        
+        pygame.display.update()
+    
+    return difficulty
+
+# main game loop
+def play_game():
+    board = create_board()
+    
+    # select difficulty level
+    difficulty = choose_difficulty()
+    if difficulty is None:
+        return
+
+    print(f"Game Levels: {difficulty}")
