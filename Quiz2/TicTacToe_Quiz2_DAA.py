@@ -105,3 +105,57 @@ def evaluate_position(board, player):
     for j in range(4):
         lines.append([board[i][j] for i in range(4)])
         
+    # diagonal
+    lines.append([board[i][i] for i in range(4)])
+    lines.append([board[i][3-i] for i in range(4)])
+    
+    for line in lines:
+        player_count = line.count(player)
+        opponent_count = line.count(opponent)
+        empty_count = line.count(" ")
+        
+        if opponent_count == 0:
+            if player_count == 4:
+                score += 1000  # win
+            elif player_count == 3:
+                score += 50   # almost won
+            elif player_count == 2:
+                score += 10   # good position
+        elif player_count == 0:
+            if opponent_count == 3:
+                score -= 100  # must block
+            elif opponent_count == 2:
+                score -= 20   # threat
+    
+    return score
+
+# BFS implementation to find the best move
+def bfs_best_move(board, player, max_depth=3):
+    """
+    Menggunakan BFS untuk mencari langkah terbaik
+    """
+    available_moves = get_available_moves(board)
+    if not available_moves:
+        return None
+    
+    best_move = None
+    best_score = -math.inf
+    
+    # queue for BFS: (board_state, move, depth, score)
+    for move in available_moves:
+        row, col = move
+        new_board = copy_board(board)
+        make_move(new_board, row, col, player)
+        
+        # check if this step wins immediately
+        if check_winner(new_board, player):
+            return move
+        
+        score = bfs_evaluate(new_board, player, max_depth)
+        
+        if score > best_score:
+            best_score = score
+            best_move = move
+    
+    return best_move
+
