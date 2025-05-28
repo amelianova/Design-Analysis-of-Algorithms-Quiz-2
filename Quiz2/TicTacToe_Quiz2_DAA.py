@@ -194,3 +194,67 @@ def bfs_evaluate(board, player, max_depth):
         move_count += 1
     
     return total_score / max(move_count, 1) if move_count > 0 else 0
+
+# DFS implementation as an alternative
+def dfs_best_move(board, player, max_depth=3):
+    """
+    DFS implementation for comparison
+    """
+    def dfs_recursive(board, player, depth, is_maximizing):
+        opponent = "X" if player == "O" else "O"
+        current_player = player if is_maximizing else opponent
+        
+        if depth == 0:
+            return evaluate_position(board, player)
+        
+        if check_winner(board, player):
+            return 1000 - (max_depth - depth) * 100
+        if check_winner(board, opponent):
+            return -1000 + (max_depth - depth) * 100
+        if is_draw(board):
+            return 0
+        
+        available_moves = get_available_moves(board)
+        if not available_moves:
+            return 0
+        
+        if is_maximizing:
+            best_score = -math.inf
+            for row, col in available_moves:
+                make_move(board, row, col, current_player)
+                score = dfs_recursive(board, player, depth - 1, False)
+                undo_move(board, row, col)
+                best_score = max(best_score, score)
+            return best_score
+        else:
+            best_score = math.inf
+            for row, col in available_moves:
+                make_move(board, row, col, current_player)
+                score = dfs_recursive(board, player, depth - 1, True)
+                undo_move(board, row, col)
+                best_score = min(best_score, score)
+            return best_score
+    
+    available_moves = get_available_moves(board)
+    if not available_moves:
+        return None
+    
+    best_move = None
+    best_score = -math.inf
+    
+    for move in available_moves:
+        row, col = move
+        make_move(board, row, col, player)
+        
+        if check_winner(board, player):
+            undo_move(board, row, col)
+            return move
+        
+        score = dfs_recursive(board, player, max_depth - 1, False)
+        undo_move(board, row, col)
+        
+        if score > best_score:
+            best_score = score
+            best_move = move
+    
+    return best_move
