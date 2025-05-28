@@ -55,3 +55,20 @@ def draw_text(screen, text, size, color, x, y):
     font = pygame.font.Font(None, size)
     label = font.render(text, True, color)
     screen.blit(label, (x - label.get_width() // 2, y - label.get_height() // 2))
+
+# check if there is a winner
+def check_winner(board, player):
+    for i in range(4):
+        if all(cell == player for cell in board[i]):
+            return True
+        if all(board[j][i] == player for j in range(4)):
+            return True
+    if all(board[i][i] == player for i in range(4)):
+        return True
+    if all(board[i][3 - i] == player for i in range(4)):
+        return True
+    return False
+
+# check if the board is full (draw game)
+def is_draw(board):
+    return all(cell != " " for row in board for cell in row)
