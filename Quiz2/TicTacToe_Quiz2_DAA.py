@@ -442,3 +442,51 @@ def play_game():
                         pygame.display.update()
                         pygame.time.delay(3000)
                         game_over = True
+                        
+        if not game_over and not player_turn:
+            thinking = True
+            screen.fill(BACKGROUND_COLOR)
+            draw_lines(screen)
+            draw_figures(screen, board)
+            draw_text(screen, f"Level: {difficulty}", 20, (100, 100, 100), SCREEN_WIDTH - 80, 20)
+            draw_text(screen, "Computer Turn", 24, (255, 100, 100), SCREEN_WIDTH // 2, 20)
+            pygame.display.update()
+            
+            if difficulty == "Easy":
+                pygame.time.delay(300)
+            elif difficulty == "Medium":
+                pygame.time.delay(700)
+            else:
+                pygame.time.delay(1000)
+            
+            move = get_best_move(board, difficulty)
+            thinking = False
+            
+            if move:
+                make_move(board, move[0], move[1], "O")
+                player_turn = True
+
+                if check_winner(board, "O"):
+                    screen.fill(BACKGROUND_COLOR)
+                    draw_lines(screen)
+                    draw_figures(screen, board)
+                    draw_text(screen, " You Lose! ", 40, (255, 0, 0), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20)
+                    draw_text(screen, f"{difficulty} level is too difficult!", 24, (180, 0, 0), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20)
+                    pygame.display.update()
+                    pygame.time.delay(3000)
+                    game_over = True
+                elif is_draw(board):
+                    screen.fill(BACKGROUND_COLOR)
+                    draw_lines(screen)
+                    draw_figures(screen, board)
+                    draw_text(screen, " DRAW! ", 40, (255, 165, 0), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20)
+                    draw_text(screen, "Game Ends in a Draw", 24, (200, 130, 0), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20)
+                    pygame.display.update()
+                    pygame.time.delay(3000)
+                    game_over = True
+
+        clock.tick(60)
+
+
+if __name__ == "__main__":
+    play_game()                
